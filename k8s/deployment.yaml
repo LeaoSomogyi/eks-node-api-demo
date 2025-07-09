@@ -17,6 +17,6 @@ spec:
     spec:
       containers:
         - name: eks-node-api-demo
-          image: 443618463033.dkr.ecr.us-east-2.amazonaws.com/eks-node-api-demo:latest
+          image: <your-ecr-uri>/eks-node-api-demo:latest
           ports:
             - containerPort: 3000
