@@ -3,16 +3,13 @@ kind: Ingress
 metadata:
   name: public-ingress
   namespace: app
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /api$1
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /api(/.*|$)
-            pathType: ImplementationSpecific
+          - path: /api
+            pathType: Prefix
             backend:
               service:
                 name: kong-kong-proxy

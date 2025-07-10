@@ -28,7 +28,6 @@ eks-node-api-demo/
 │   ├── deployment.yaml # Kubernetes deployment configuration
 │   └── service.yaml    # Kubernetes service configuration
 │   └── ingress.yaml    # Kubernetes ingress configuration
-│   └── kong.yaml       # Kong ingress configuration
 ├── README.md           # Project documentation
 └── .gitignore          # Git ignore file
 ```
@@ -53,20 +52,29 @@ eks-node-api-demo/
     ```bash
     helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
     helm repo update
-    helm install ingress-nginx ingress-nginx/ingress-nginx --namespace app --create-namespace   
+    helm install ingress-nginx ingress-nginx/ingress-nginx --namespace app --create-namespace
     ```
 
-4. Install Kong Ingress Controller using Helm:
+4. Install Kong using Helm:
+
+First, we need to create a configmap for Kongs Routes:
+
+    ```bash
+    kubectl apply -f k8s/configmap.yaml
+    ```
+
+Then, install Kong with Helm:
 
     ```bash
     helm repo add kong https://charts.konghq.com
     helm repo update
     helm install kong kong/kong \
         --namespace app \
-        --set ingressController.installCRDs=true \
-        --set proxy.type=LoadBalancer \
+        --set ingressController.installCRDs=false \
+        --set ingressController.enabled=false \
         --set admin.enabled=false \
-        --set env.database=off
+        --set env.database="off" \
+        --set dblessConfig.configMap="kong-config"
     ```
 
 5. Deploy the application to EKS, remember to replace `<your-ecr-repo-uri>` with your actual ECR repository URI in the `deployment.yaml` file:
@@ -75,7 +83,6 @@ eks-node-api-demo/
     kubectl apply -f k8s/deployment.yaml
     kubectl apply -f k8s/service.yaml
     kubectl apply -f k8s/ingress.yaml
-    kubectl apply -f k8s/kong.yaml
     ```
 
 6. Get the external IP of the service:
@@ -85,4 +92,4 @@ eks-node-api-demo/
     ```
 
 7. Access the application:
-    Open your browser and navigate to `http://<EXTERNAL-IP>/api/health`.
+    Open your browser and navigate to `http://<EXTERNAL-IP>/api/health`, you should see a text `OK from EKS!` response indicating the health of the application.

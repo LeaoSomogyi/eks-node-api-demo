@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kong-config
+  namespace: app
+data:
+  kong.yml: |
+    _format_version: "3.0"
+    services:
+      - name: eks-node-api-demo
+        host: http://eks-node-api-demo.app.svc.cluster.local:80
+        routes:
+          - name: api-route
+            paths:
+              - /api
+            strip_path: true
